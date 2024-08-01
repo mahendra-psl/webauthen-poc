@@ -1,0 +1,14 @@
+.page {
+  height: calc(100dvh - var(--spacer) * 3);
+}
+.page-title {
+  font-size: calc(var(--spacer) * 3);
+  font-weight: 100;
+  letter-spacing: calc(var(--spacer-quarter));
+  text-transform: uppercase;
+}
+.width {
+  max-width: calc(var(--spacer) * 40);
+  min-width: calc(var(--spacer) * 20);
+  width: 50%;
+}

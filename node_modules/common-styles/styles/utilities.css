@@ -1,0 +1,16 @@
+.noselect, .ns {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.text-center, .t-center {
+  text-align: center;
+}
+.text-left, .t-left {
+  text-align: left;
+}
+.text-right, .t-right {
+  text-align: right;
+}
