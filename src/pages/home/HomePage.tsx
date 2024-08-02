@@ -13,7 +13,7 @@ function Home(): React.JSX.Element {
   const navigate = useNavigate()
 
   const handleSignOut = () => {
-    deleteValue('authorized-user')
+     deleteValue('authorized-user')
     return navigate(ROUTES.index)
   }
 
@@ -25,14 +25,15 @@ function Home(): React.JSX.Element {
       }
       const registeredUsersArray = getValue<RegisteredUser[]>('users')
       if (!registeredUsersArray) {
-        deleteValue('authorized-user')
+         deleteValue('authorized-user')
         return navigate(ROUTES.index)
       }
       const userData = registeredUsersArray.filter(
-        (entry) => entry.id === authorizedUser.id
+        (entry) => entry.user_id === authorizedUser.id
       )
+      
       if (userData.length === 0) {
-        deleteValue('authorized-user')
+         deleteValue('authorized-user')
         return navigate(ROUTES.index)
       }
       return setUser(userData[0])

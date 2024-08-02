@@ -1,14 +1,17 @@
-import randomString from './random-string'
+import randomString from "./random-string";
 
-interface CreateChallengeResult {
+/* interface CreateChallengeResult {
   encoded: Uint8Array;
   plaintext: string;
 }
-
-export default function createChallenge(): CreateChallengeResult {
-  const plaintext = `${Date.now()}${randomString(32)}`
+ */
+export default function createChallenge(): any {
+  const plaintext = `${Date.now()}${randomString(32)}`;
+  const challenge = new Uint8Array(32);
+  window.crypto.getRandomValues(challenge);
+  //return challenge;
   return {
-    encoded: new TextEncoder().encode(plaintext),
+    encoded: challenge,
     plaintext,
-  }
+  };
 }

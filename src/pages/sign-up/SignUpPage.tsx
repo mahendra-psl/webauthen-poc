@@ -7,7 +7,6 @@ import createChallenge from '../../utilities/challenge'
 import ErrorModal from '../../components/ErrorModal'
 import { getValue, storeValue } from '../../utilities/persistent-store'
 import Input from '../../components/Input'
-import randomString from '../../utilities/random-string'
 import { ROUTES } from '../../constants'
 import Spinner from '../../components/Spinner'
 import './styles.css'
@@ -40,26 +39,27 @@ function SignUp(): React.JSX.Element {
           type: 'public-key'
         }],
         rp: {
-          // id:'192.168.120.217',
+          id: location.hostname,
           name: 'WebAuthn demo'
         },
         user: {
           displayName: name,
-          id: new TextEncoder().encode(randomString(32)),
+          id: new TextEncoder().encode(trimmedEmail),
           name: email
-        }
+        },
+        attestation: 'direct'
       }
-  
-      try {
-        const result = await navigator.credentials.create({ publicKey: options })
-        setIsLoading(false)
 
+      try {
+        const result:any = await navigator.credentials.create({ publicKey: options })
+        setIsLoading(false)
         const registeredUser: RegisteredUser = {
           challengePlaintext: plaintext,
           createdAt: Date.now(),
           email: trimmedEmail,
-          id: result?.id || '',
+          id: arrayBufferToBase64(result?.rawId) || '',
           name: trimmedName,
+          user_id:result?.id
         }
         const existingUsers = getValue<RegisteredUser[]>('users') || []
         storeValue<RegisteredUser[]>(
@@ -69,6 +69,7 @@ function SignUp(): React.JSX.Element {
             registeredUser
           ]
         )
+        console.log(result?.id);
         storeValue<AuthorizedUser>(
           'authorized-user',
           {
@@ -80,7 +81,6 @@ function SignUp(): React.JSX.Element {
         return navigate(ROUTES.home, { replace: true })
       } catch (error:any) {
         alert(error.message);
-        console.log('error >>',error.message);
         setIsLoading(false)
         return setShowErrorModal(true)
       }
@@ -91,7 +91,15 @@ function SignUp(): React.JSX.Element {
       navigate
     ]
   )
-
+  const arrayBufferToBase64 = (buffer:any) => {
+    let binary = "";
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+  }
   return (
     <div className="flex d-col j-center mh-auto page width">
       { showErrorModal && (

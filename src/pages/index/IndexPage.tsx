@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {  useNavigate } from 'react-router-dom'
 
-import type { AuthorizedUser } from '../../models'
+import type { AuthorizedUser, RegisteredUser } from '../../models'
 import Button from '../../components/Button'
 import createChallenge from '../../utilities/challenge'
 import ErrorModal from '../../components/ErrorModal'
@@ -18,14 +18,32 @@ function Index(): React.JSX.Element {
   const { encoded: challenge } = createChallenge()
 
   const navigate = useNavigate()
-
+  
+  function base64ToArrayBuffer(base64:any) {
+    const binary_string = window.atob(base64);
+    const len = binary_string.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
   const handleSignIn = async () => {
     try {
+      const [existingUsers] = getValue<RegisteredUser[]>('users') || []
       const result = await navigator.credentials.get({
         mediation: 'silent',
-        publicKey: { challenge }
+        publicKey : {
+          challenge: challenge,
+          allowCredentials: [{
+              type: 'public-key',
+              id: base64ToArrayBuffer(existingUsers.id)
+          }],
+          //timeout: 60000,
+          userVerification: 'preferred'
+      }
       })
-      alert(JSON.stringify(result))
+    
       storeValue<AuthorizedUser>('authorized-user', {
         id: result?.id || '',
         isAuthorized: true,
@@ -43,7 +61,7 @@ function Index(): React.JSX.Element {
         setWebAuthnIsAvailable(true)
       }
       setTimeout(() => setIsLoading(false), 500)
-
+    
       if (getValue<AuthorizedUser>('authorized-user')) {
         return navigate(ROUTES.home)
       }
@@ -60,7 +78,7 @@ function Index(): React.JSX.Element {
           />
         ) }
         <div className="page-title ns t-center">
-          WebAuthn
+            Biometric
         </div>
         { isLoading && (
           <div className="f j-center mt-2">
